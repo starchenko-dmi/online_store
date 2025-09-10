@@ -34,7 +34,7 @@ class Product:
                     self.__price = price
                     return
                 else:
-                    print("Цена осталась без именений")
+                    print("Цена осталась без изменений")
                     return
             else:
                 self.__price = price
@@ -68,8 +68,9 @@ class Category:
         Category.product_count += len(products)
 
     def add_product(self, products: Product):
-        self.__products.append(products)
-        Category.product_count += 1
+        if isinstance(products, Product):
+            self.__products.append(products)
+            Category.product_count += 1
 
     @property
     def products(self) -> str:
