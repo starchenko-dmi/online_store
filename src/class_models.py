@@ -16,6 +16,15 @@ class Product:
         self.__price = price
         self.quantity = quantity
 
+    def __str__(self):
+        return f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.'
+
+    def __add__(self, other):
+        if isinstance(other, Product):
+            return self.__price * self.quantity + other.__price * other.quantity
+        else:
+            raise TypeError('сложить можно только объекты класса Product')
+
     @property
     def price(self) -> float:
         return self.__price
@@ -67,6 +76,13 @@ class Category:
         Category.category_count += 1
         Category.product_count += len(products)
 
+    def __str__(self):
+        sum_products = 0
+        for product in self.__products:
+            sum_products += product.quantity
+        return f'{self.name}, количество продуктов: {sum_products} шт.'
+
+
     def add_product(self, products: Product):
         if isinstance(products, Product):
             self.__products.append(products)
@@ -75,7 +91,5 @@ class Category:
     @property
     def products(self) -> str:
         for product in self.__products:
-            print(
-                f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт."
-            )
+            print(product.__str__())
         return

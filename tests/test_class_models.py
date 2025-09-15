@@ -208,3 +208,39 @@ def test_category_products_property_returns_none():
     category = Category("Тест", "Описание", [])
     result = category.products
     assert result is None  # Так как функция не возвращает значение
+
+
+def test_product_str():
+    """Тест для метода __str__ класса Product"""
+    product = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    assert str(product) == "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+
+
+def test_product_add():
+    """Тест для метода __add__ между двумя продуктами"""
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+
+    total = product1 + product2
+    expected = 180000 * 5 + 210000 * 8
+    assert total == expected
+
+
+def test_product_add_type_error():
+    """Тест, что __add__ не работает с объектами другого типа"""
+    product1 = Product("Samsung", "Описание", 1000.0, 10)
+    not_product = "Это не продукт"
+
+    with pytest.raises(TypeError):
+        product1 + not_product  # Должно вызвать TypeError, если не реализовано иное поведение
+
+
+def test_category_str():
+    """Тест для метода __str__ класса Category"""
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    category = Category("Смартфоны",
+                        "Смартфоны, как средство не только коммуникации, но и получения фотографий и видео",
+                        [product1, product2])
+
+    assert str(category) == "Смартфоны, количество продуктов: 13 шт."
