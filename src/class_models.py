@@ -21,7 +21,7 @@ class Product:
 
     def __add__(self, other):
         if isinstance(other, Product):
-            return self.__price * self.quantity + other.__price * other.quantity
+            return self.price * self.quantity + other.price * other.quantity
         else:
             raise TypeError("сложить можно только объекты класса Product")
 
