@@ -1,6 +1,6 @@
 import pytest
 
-from src.class_models import Category, Product
+from src.class_models import Category, IterProducts, Product
 
 
 @pytest.fixture
@@ -208,3 +208,135 @@ def test_category_products_property_returns_none():
     category = Category("Тест", "Описание", [])
     result = category.products
     assert result is None  # Так как функция не возвращает значение
+
+
+def test_product_str():
+    """Тест для метода __str__ класса Product"""
+    product = Product(
+        "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+    )
+    assert str(product) == "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+
+
+def test_product_add():
+    """Тест для метода __add__ между двумя продуктами"""
+    product1 = Product(
+        "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+    )
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+
+    total = product1 + product2
+    expected = 180000 * 5 + 210000 * 8
+    assert total == expected
+
+
+def test_product_add_type_error():
+    """Тест, что __add__ не работает с объектами другого типа"""
+    product1 = Product("Samsung", "Описание", 1000.0, 10)
+    not_product = "Это не продукт"
+
+    with pytest.raises(TypeError):
+        (
+            product1 + not_product
+        )  # Должно вызвать TypeError, если не реализовано иное поведение
+
+
+def test_category_str():
+    """Тест для метода __str__ класса Category"""
+    product1 = Product(
+        "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+    )
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    category = Category(
+        "Смартфоны",
+        "Смартфоны, как средство не только коммуникации, но и получения фотографий и видео",
+        [product1, product2],
+    )
+
+    assert str(category) == "Смартфоны, количество продуктов: 13 шт."
+
+
+def test_iter_products_normal_case():
+    """Тест: итерация по нескольким продуктам"""
+    p1 = Product("Samsung", "Смартфон", 1000.0, 5)
+    p2 = Product("iPhone", "Смартфон", 2000.0, 3)
+    p3 = Product("Xiaomi", "Смартфон", 800.0, 7)
+
+    category = Category("Смартфоны", "Все смартфоны", [p1, p2, p3])
+    iterator = IterProducts(category)
+
+    products = list(iterator)  # Собираем все продукты в список
+
+    assert len(products) == 3
+    assert products[0] == p1
+    assert products[1] == p2
+    assert products[2] == p3
+
+
+def test_iter_products_empty_category():
+    """Тест: итерация по пустой категории"""
+    category = Category("Пустая", "Нет продуктов", [])
+    iterator = IterProducts(category)
+
+    products = list(iterator)
+
+    assert len(products) == 0
+
+
+def test_iter_products_single_product():
+    """Тест: итерация по одному продукту"""
+    p = Product("Один", "Единственный", 999.9, 1)
+    category = Category("Один продукт", "Тест", [p])
+    iterator = IterProducts(category)
+
+    products = list(iterator)
+
+    assert len(products) == 1
+    assert products[0] == p
+
+
+def test_iter_products_type_error():
+    """Тест: TypeError при передаче не-Category объекта"""
+    with pytest.raises(
+        TypeError, match="Данный класс работает только с объектами Category"
+    ):
+        IterProducts("не категория")
+
+    with pytest.raises(TypeError):
+        IterProducts(123)
+
+    with pytest.raises(TypeError):
+        IterProducts(None)
+
+
+def test_iter_products_manual_iteration():
+    """Тест: ручной вызов __iter__ и __next__"""
+    p1 = Product("Prod1", "Описание", 100.0, 1)
+    p2 = Product("Prod2", "Описание", 200.0, 1)
+    category = Category("Тест", "Описание", [p1, p2])
+
+    iterator = IterProducts(category)
+    iter_obj = iter(iterator)  # вызывает __iter__
+
+    assert next(iter_obj) == p1
+    assert next(iter_obj) == p2
+
+    with pytest.raises(StopIteration):
+        next(iter_obj)  # Больше нет элементов
+
+
+def test_iter_products_multiple_iterations():
+    """Тест: можно ли итерироваться несколько раз?"""
+    p = Product("Тест", "Описание", 500.0, 1)
+    category = Category("Тестовая", "Категория", [p])
+
+    iterator = IterProducts(category)
+
+    # Первая итерация
+    products1 = list(iterator)
+    assert len(products1) == 1
+
+    # Вторая итерация — должна работать снова!
+    products2 = list(iterator)
+    assert len(products2) == 1
+    assert products1[0] == products2[0]
