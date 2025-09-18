@@ -1,9 +1,10 @@
 import pytest
-from src.class_models import Product
-from src.subcategories_products import Smartphone, LawnGrass
 
+from src.class_models import Product
+from src.subcategories_products import LawnGrass, Smartphone
 
 # --- Тесты для Smartphone ---
+
 
 def test_smartphone_creation():
     """Проверка создания объекта Smartphone"""
@@ -15,7 +16,7 @@ def test_smartphone_creation():
         efficiency="High",
         model="15",
         memory=256,
-        color="Black"
+        color="Black",
     )
 
     assert phone.name == "iPhone 15"
@@ -47,6 +48,7 @@ def test_smartphone_addition_with_wrong_type():
 
 # --- Тесты для LawnGrass ---
 
+
 def test_lawn_grass_creation():
     """Проверка создания объекта LawnGrass"""
     grass = LawnGrass(
@@ -56,7 +58,7 @@ def test_lawn_grass_creation():
         quantity=100,
         country="Russia",
         germination_period=7,
-        color="Green"
+        color="Green",
     )
 
     assert grass.name == "Premium Grass"
