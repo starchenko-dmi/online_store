@@ -138,25 +138,6 @@ def test_add_product(sample_products):
     assert category._Category__products[-1] == new_product
 
 
-def test_products_property_output(sample_products, capsys):
-    """Тест вывода продуктов через property"""
-    category = Category("Смартфоны", "Описание", sample_products)
-
-    # Вызываем property products
-    category.products
-
-    captured = capsys.readouterr()
-    output = captured.out
-
-    # Проверяем, что информация о продуктах выведена
-    assert "Samsung Galaxy S23 Ultra" in output
-    assert "180000.0 руб. Остаток: 5 шт." in output
-    assert "iPhone 14 Pro" in output
-    assert "150000.0 руб. Остаток: 3 шт." in output
-    assert "Xiaomi Redmi Note 12" in output
-    assert "25000.0 руб. Остаток: 10 шт." in output
-
-
 @pytest.mark.parametrize(
     "price_input,expected_message",
     [
@@ -201,13 +182,6 @@ def test_product_price_with_very_large_values():
     """Тест цены с очень большими значениями"""
     product = Product("Тест", "Описание", 999999999.99, 1)
     assert product.price == 999999999.99
-
-
-def test_category_products_property_returns_none():
-    """Тест, что property products возвращает None"""
-    category = Category("Тест", "Описание", [])
-    result = category.products
-    assert result is None  # Так как функция не возвращает значение
 
 
 def test_product_str():

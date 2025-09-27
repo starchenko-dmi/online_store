@@ -1,8 +1,11 @@
 from symtable import Class
 from typing import List
 
+from src.BaseProduct import BaseProduct
+from src.PrintMixin import PrintMixin
 
-class Product:
+
+class Product(BaseProduct, PrintMixin):
     """Класс продуктов"""
 
     name: str
@@ -15,6 +18,7 @@ class Product:
         self.description = description
         self.__price = price
         self.quantity = quantity
+        super().__init__()
 
     def __str__(self):
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
@@ -65,40 +69,39 @@ class Category:
 
     category_count = 0
     product_count = 0
-    name: str
-    description: str
-    products: List[Product]
 
-    def __init__(self, name: str, description: str, products: List[Product]):
+    def __init__(self, name: str, description: str, products: List[Product] = None):
         self.name = name
         self.description = description
-        self.__products = products
+        self.__products = products if products is not None else []
         Category.category_count += 1
-        Category.product_count += len(products)
+        Category.product_count += len(self.__products)
 
     def __str__(self):
-        sum_products = 0
-        for product in self.__products:
-            sum_products += product.quantity
-        return f"{self.name}, количество продуктов: {sum_products} шт."
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
 
     def __len__(self):
         return len(self.__products)
 
-    def add_product(self, products: Product):
-        if isinstance(products, Product):
-            self.__products.append(products)
+    def add_product(self, product: Product):
+        if isinstance(product, Product):
+            self.__products.append(product)
             Category.product_count += 1
+        else:
+            raise TypeError("Можно добавлять только объекты класса Product")
 
     @property
     def products_list(self) -> List[Product]:
+        """Возвращает список продуктов (для внутреннего использования)"""
         return self.__products
 
     @property
     def products(self) -> str:
-        for product in self.__products:
-            print(product.__str__())
-        return
+        """Возвращает строковое представление всех продуктов"""
+        if not self.__products:
+            return "Нет продуктов в категории."
+        return "\n".join(str(product) for product in self.__products)
 
 
 class IterProducts:
