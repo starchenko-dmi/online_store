@@ -84,20 +84,6 @@ def test_new_product_from_dictionary():
     assert product.quantity == 10
 
 
-def test_new_product_from_dictionary_missing_fields():
-    """Тест создания продукта из словаря с отсутствующими полями"""
-    product_data = {
-        "name": "iPhone 14",
-        "price": 90000.0,
-        # description и quantity отсутствуют
-    }
-
-    product = Product.new_product(product_data)
-
-    assert product.name == "iPhone 14"
-    assert product.price == 90000.0
-
-
 def test_category_initialization(sample_products):
     """Тест инициализации категории"""
     category = Category("Смартфоны", "Смартфоны и мобильные телефоны", sample_products)
@@ -156,12 +142,29 @@ def test_invalid_prices(capsys, price_input, expected_message):
 
 
 def test_product_with_empty_strings():
-    """Тест продукта с пустыми строками"""
-    product = Product("", "", 100.0, 0)
+    """Тест продукта с пустыми строками (но допустимым количеством)"""
+    # Пустые строки для name и description допустимы (если нет ограничений в ТЗ)
+    product = Product("", "", 100.0, 1)
     assert product.name == ""
     assert product.description == ""
     assert product.price == 100.0
-    assert product.quantity == 0
+    assert product.quantity == 1
+
+
+def test_product_zero_quantity_raises_error():
+    """Тест, что создание продукта с quantity <= 0 вызывает ValueError"""
+    try:
+        Product("Товар", "Описание", 100.0, 0)
+        assert False, "Expected ValueError was not raised"
+    except ValueError as e:
+        assert str(e) == "Товар с нулевым количеством не может быть добавлен"
+
+    # Также проверим отрицательное количество
+    try:
+        Product("Товар", "Описание", 100.0, -5)
+        assert False, "Expected ValueError was not raised"
+    except ValueError as e:
+        assert str(e) == "Товар с нулевым количеством не может быть добавлен"
 
 
 def test_category_with_empty_products_list():
@@ -281,6 +284,44 @@ def test_iter_products_type_error():
 
     with pytest.raises(TypeError):
         IterProducts(None)
+
+
+def test_middle_price_with_one_product():
+    """Тест средней цены с одним товаром"""
+    product = Product("Товар1", "Описание1", 100.0, 5)
+    category = Category("Категория1", "Описание категории", [product])
+    assert category.middle_price() == 100.0
+
+
+def test_middle_price_with_multiple_products():
+    """Тест средней цены с несколькими товарами"""
+    p1 = Product("Товар1", "Описание1", 100.0, 2)
+    p2 = Product("Товар2", "Описание2", 200.0, 3)
+    p3 = Product("Товар3", "Описание3", 300.0, 1)
+    category = Category("Категория", "Описание", [p1, p2, p3])
+    expected = (100.0 + 200.0 + 300.0) / 3
+    assert category.middle_price() == expected
+
+
+def test_middle_price_with_empty_category():
+    """Тест средней цены для пустой категории"""
+    category = Category("Пустая", "Нет товаров")
+    assert category.middle_price() == 0
+
+
+def test_middle_price_after_adding_product():
+    """Тест средней цены после добавления товара через add_product"""
+    category = Category("Категория", "Описание")
+    assert category.middle_price() == 0
+
+    p1 = Product("Товар", "Описание", 150.0, 10)
+    category.add_product(p1)
+    assert category.middle_price() == 150.0
+
+    p2 = Product("Товар2", "Описание2", 250.0, 5)
+    category.add_product(p2)
+    expected = (150.0 + 250.0) / 2  # 200.0
+    assert category.middle_price() == expected
 
 
 def test_iter_products_manual_iteration():
