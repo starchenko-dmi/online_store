@@ -1,5 +1,6 @@
 class PrintMixin:
     """Класс Миксин ждя вывода информации о созданном экземпляре класса"""
+
     def __init__(self):
         print(repr(self))
 
